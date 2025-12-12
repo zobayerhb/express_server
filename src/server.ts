@@ -70,11 +70,45 @@ app.post("/users", async (req: Request, res: Response) => {
       message: err.message,
     });
   }
+});
 
-  res.status(201).json({
-    success: true,
-    message: "API is working",
-  });
+// Note: get all users
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users`);
+
+    res.status(200).json({
+      success: true,
+      message: "User retrive successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      details: err,
+    });
+  }
+});
+
+// Note: get single user
+app.get("/users/:id", async (req: Request, res: Response) => {
+  const body = req.params.id;
+
+  const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [body]);
+
+  if (result.rows.length === 0) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+    });
+  } else {
+    res.status(200).json({
+      success: true,
+      message: "User fetched successfully",
+      data: result.rows[0],
+    });
+  }
 });
 
 app.listen(port, () => {
