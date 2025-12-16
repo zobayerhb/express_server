@@ -17,6 +17,7 @@ const pool = new Pool({
 
 // initdb
 const initDB = async () => {
+  // Note: create users query
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users(
     id SERIAL PRIMARY KEY,
@@ -30,6 +31,7 @@ const initDB = async () => {
     )
     `);
 
+  // Note: create todos query
   await pool.query(`
         CREATE TABLE IF NOT EXISTS todos(
         id SERIAL PRIMARY KEY,
@@ -134,6 +136,35 @@ app.put("/users/:id", async (req: Request, res: Response) => {
     });
   }
 });
+
+// Note: delete user
+app.delete("/users/:id", async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  try {
+    const result = await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
+
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully",
+        data: result.rows,
+      });
+    }
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+//  TODO:  USER TODO CREATE
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
