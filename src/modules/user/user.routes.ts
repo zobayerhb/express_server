@@ -1,32 +1,24 @@
 // import { Router } from "express";
 import express, { Request, Response } from "express";
-import { pool } from "../../config/db";
 import { userController } from "./user.controller";
 
 const router = express();
 
-// router --> controller --> services(business logic ---> database logic)
+// router --> controller (only work on --> request and response ) --> services (business logic ---> database logic)
 
 // app.use("/user/", userRoutes)
 router.post("/", userController.userCreate);
 
 // get users
-router.get("/", async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(`SELECT * FROM users`);
+router.get("/", userController.getUsers);
 
-    res.status(200).json({
-      success: true,
-      message: "User retrive successfully",
-      data: result.rows,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-      details: err,
-    });
-  }
-});
+// get single user
+router.get("/:id", userController.getSingleUser);
+
+// update user
+router.put("/:id", userController.updateSingelUser);
+
+// delete user
+router.delete("/:id", userController.deleteUser);
 
 export const userRoutes = router;

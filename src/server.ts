@@ -21,95 +21,11 @@ app.get("/", logger, (req: Request, res: Response) => {
 // use app.use
 app.use("/users", userRoutes);
 
-// Note: get all users
-// app.get("/users", async (req: Request, res: Response) => {
-//   try {
-//     const result = await pool.query(`SELECT * FROM users`);
-
-//     res.status(200).json({
-//       success: true,
-//       message: "User retrive successfully",
-//       data: result.rows,
-//     });
-//   } catch (err: any) {
-//     res.status(500).json({
-//       success: false,
-//       message: err.message,
-//       details: err,
-//     });
-//   }
-// });
-
-// Note: get single user
-app.get("/users/:id", async (req: Request, res: Response) => {
-  const body = req.params.id;
-
-  const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [body]);
-
-  if (result.rows.length === 0) {
-    res.status(404).json({
-      success: false,
-      message: "User not found",
-    });
-  } else {
-    res.status(200).json({
-      success: true,
-      message: "User fetched successfully",
-      data: result.rows[0],
-    });
-  }
-});
-
 // Note: update user
-app.put("/users/:id", async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const { name, email } = req.body;
-
-  const result = await pool.query(
-    `UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING *`,
-    [name, email, id]
-  );
-
-  if (result.rows.length === 0) {
-    res.status(404).json({
-      success: false,
-      message: "User not found",
-    });
-  } else {
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      data: result.rows[0],
-    });
-  }
-});
+app.use("/users/:id", userRoutes);
 
 // Note: delete user
-app.delete("/users/:id", async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  try {
-    const result = await pool.query(`DELETE FROM users WHERE id = $1`, [id]);
-
-    if (result.rowCount === 0) {
-      res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "User deleted successfully",
-        data: result.rows,
-      });
-    }
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+app.use("/users/:id", userRoutes);
 
 //  TODO:  USER TODO CREATE
 app.post("/todos", async (req: Request, res: Response) => {
