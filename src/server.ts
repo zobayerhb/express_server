@@ -3,6 +3,7 @@ import config from "./config";
 import initDB, { pool } from "./config/db";
 import logger from "./middleware/logger";
 import { userRoutes } from "./modules/user/user.routes";
+import { authRoutes } from "./modules/auth/auth.routes";
 
 const app = express();
 const port = config.port;
@@ -34,7 +35,7 @@ app.post("/todos", async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       `INSERT INTO todos(user_id, title) VALUES($1, $2) RETURNING *`,
-      [user_id, title]
+      [user_id, title],
     );
 
     res.status(201).json({
@@ -67,6 +68,9 @@ app.get("/todos", async (req: Request, res: Response) => {
     });
   }
 });
+
+// Note: auth routes
+app.use("/auth", authRoutes);
 
 // 404 not found
 app.use((req, res) => {
