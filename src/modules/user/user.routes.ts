@@ -1,6 +1,7 @@
 // import { Router } from "express";
 import express, { Request, Response } from "express";
 import { userController } from "./user.controller";
+import auth from "../../middleware/auth";
 
 const router = express();
 
@@ -10,7 +11,7 @@ const router = express();
 router.post("/", userController.userCreate);
 
 // get users
-router.get("/", userController.getUsers);
+router.get("/", auth("admin"), userController.getUsers);
 
 // get single user
 router.get("/:id", userController.getSingleUser);
